@@ -8,6 +8,8 @@ class CustomUser(AbstractUser):
         ("admin", "Admin"),
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="patient")
+    # Indicates whether a pharmacist has been approved by an admin.
+    is_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.username} ({self.role})"

@@ -1,0 +1,67 @@
+<!-- templates/registration/login.html -->
+{% load widget_tweaks %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title mb-3">Sign in</h4>
+
+              <!-- Display Django Messages (e.g. Pending Approval warning) -->
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+
+              <!-- Display Standard Form Errors (Only shown if no custom messages were added) -->
+              {% if form.non_field_errors and not messages %}
+                <div class="alert alert-danger">
+                  {% for err in form.non_field_errors %}
+                    <div>{{ err }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                  {{ form.username.label_tag }}
+                  {{ form.username|add_class:"form-control" }}
+                  {% for error in form.username.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="mb-3">
+                  {{ form.password.label_tag }}
+                  {{ form.password|add_class:"form-control" }}
+                  {% for error in form.password.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+              </form>
+
+              <hr>
+              <div class="text-center">
+                <a href="{% url 'users:register_patient' %}">Register as patient</a> |
+                <a href="{% url 'users:register_pharmacist' %}">Register as pharmacist</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

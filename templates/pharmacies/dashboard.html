@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Pharmacist Dashboard{% endblock %}
+{% block content %}
+  <h1>Pharmacist Dashboard (placeholder)</h1>
+  <p>Welcome, {{ user.get_full_name|default:user.username }}. This is the pharmacist dashboard.</p>
+{% endblock %}
