@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Medicine - Inventory{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Header -->
+            <div class="mb-4">
+                <h1 class="h3 mb-1">
+                    <i class="fas fa-pills"></i>
+                    {% if form.instance.pk %}
+                        Edit Medicine in Inventory
+                    {% else %}
+                        Add New Medicine to Inventory
+                    {% endif %}
+                </h1>
+                <p class="text-muted">{{ pharmacy.name }}</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Medicine Name -->
+                        <div class="mb-3">
+                            <label for="{{ form.medicine_name.id_for_label }}" class="form-label">
+                                <i class="fas fa-capsules"></i> Medicine Name <span class="text-danger">*</span>
+                            </label>
+                            {{ form.medicine_name }}
+                            {% if form.medicine_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.medicine_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Enter the medicine name or select from existing medicines
+                            </small>
+                        </div>
+
+                        <!-- Active Ingredient -->
+                        <div class="mb-3">
+                            <label for="{{ form.active_ingredient.id_for_label }}" class="form-label">
+                                <i class="fas fa-flask"></i> Active Ingredient
+                            </label>
+                            {{ form.active_ingredient }}
+                            {% if form.active_ingredient.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.active_ingredient.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag"></i> Category
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.category.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Strength/Dosage Form -->
+                        <div class="mb-3">
+                            <label for="{{ form.strength.id_for_label }}" class="form-label">
+                                <i class="fas fa-weight"></i> Strength/Dosage Form
+                            </label>
+                            {{ form.strength }}
+                            {% if form.strength.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.strength.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                e.g., 500mg, tablet, syrup, injection
+                            </small>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                    <i class="fas fa-box"></i> Quantity <span class="text-danger">*</span>
+                                </label>
+                                {{ form.quantity }}
+                                {% if form.quantity.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.quantity.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Minimum Threshold -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.minimum_threshold.id_for_label }}" class="form-label">
+                                    <i class="fas fa-exclamation-triangle"></i> Min. Threshold <span class="text-danger">*</span>
+                                </label>
+                                {{ form.minimum_threshold }}
+                                {% if form.minimum_threshold.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.minimum_threshold.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Alert when stock falls below this
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Form Errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-circle"></i> <strong>Error!</strong>
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                {% if form.instance.pk %}
+                                    Update Medicine
+                                {% else %}
+                                    Add Medicine
+                                {% endif %}
+                            </button>
+                            <a href="{% url 'inventory:dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <strong>Note:</strong> All changes to inventory are automatically logged in the audit trail.
+                View the <a href="{% url 'inventory:audit_log' %}" class="alert-link">audit log</a> for complete history.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bootstrap form validation
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    }());
+</script>
+{% endblock %}
