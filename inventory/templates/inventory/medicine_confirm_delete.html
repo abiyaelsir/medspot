@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Medicine - Confirm{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <!-- Alert Card -->
+            <div class="card border-danger shadow">
+                <div class="card-body p-4">
+                    <!-- Warning Icon -->
+                    <div class="text-center mb-4">
+                        <i class="fas fa-trash-alt fa-3x text-danger"></i>
+                    </div>
+
+                    <!-- Title -->
+                    <h2 class="card-title text-center mb-3 text-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Delete Medicine
+                    </h2>
+
+                    <!-- Pharmacy Info -->
+                    <p class="text-muted text-center mb-3">
+                        <small>{{ pharmacy.name }}</small>
+                    </p>
+
+                    <!-- Medicine Details -->
+                    <div class="alert alert-light border mb-4">
+                        <h5 class="mb-2">
+                            <i class="fas fa-pills"></i> {{ medicine.name }}
+                        </h5>
+                        <table class="table table-sm mb-0">
+                            <tr>
+                                <td><strong>Active Ingredient:</strong></td>
+                                <td>{{ medicine.active_ingredient|default:"—" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Category:</strong></td>
+                                <td>{{ medicine.category|default:"—" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dosage Form:</strong></td>
+                                <td>{{ medicine.dosage_form|default:"—" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Current Quantity:</strong></td>
+                                <td><span class="badge badge-primary">{{ inventory.quantity }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Minimum Threshold:</strong></td>
+                                <td>{{ inventory.minimum_threshold }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Warning Message -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Warning!</strong>
+                        <p class="mb-0 mt-2">
+                            This action will remove this medicine from your pharmacy's inventory.
+                            This action <strong>cannot be undone</strong>, but a record will remain in the audit log.
+                        </p>
+                    </div>
+
+                    <!-- Confirmation Text -->
+                    <p class="text-muted text-center mb-4">
+                        Are you sure you want to delete <strong>{{ medicine.name }}</strong> from inventory?
+                    </p>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2 justify-content-center">
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Yes, Delete
+                            </button>
+                        </form>
+                        <a href="{% url 'inventory:dashboard' %}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Footer -->
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="fas fa-info-circle"></i>
+                <small>
+                    <strong>Note:</strong> Deleting inventory doesn't remove the medicine from the system.
+                    Other pharmacies can still add it to their inventory.
+                    You can view the complete deletion record in the <a href="{% url 'inventory:audit_log' %}" class="alert-link">audit log</a>.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
