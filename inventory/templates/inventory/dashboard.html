@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inventory Dashboard - {{ pharmacy.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-pills"></i> Inventory Dashboard
+            </h1>
+            <p class="text-muted">{{ pharmacy.name }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'inventory:add_medicine' %}" class="btn btn-primary me-2">
+                <i class="fas fa-plus"></i> Add Medicine
+            </a>
+            <a href="{% url 'inventory:upload_inventory' %}" class="btn btn-info">
+                <i class="fas fa-upload"></i> Bulk Upload
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-primary text-uppercase mb-1">
+                        <small><b>Total Medicines</b></small>
+                    </div>
+                    <div class="h3 mb-0">{{ total_medicines }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-warning text-uppercase mb-1">
+                        <small><b>Low Stock</b></small>
+                    </div>
+                    <div class="h3 mb-0">{{ low_stock_count }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-info text-uppercase mb-1">
+                        <small><b>Audit Log</b></small>
+                    </div>
+                    <a href="{% url 'inventory:audit_log' %}" class="btn btn-sm btn-info mt-2">
+                        <i class="fas fa-history"></i> View
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-success text-uppercase mb-1">
+                        <small><b>Pharmacy Info</b></small>
+                    </div>
+                    <small class="text-muted">{{ pharmacy.location|default:"No location set" }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list"></i> Inventory Items
+            </h6>
+            {% if inventory_items.count > 0 %}
+            <span class="badge badge-primary">{{ inventory_items.count }} items</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if inventory_items %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Medicine Name</th>
+                                <th>Active Ingredient</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Min. Threshold</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventory_items %}
+                            <tr class="{% if item.quantity <= item.minimum_threshold and item.minimum_threshold > 0 %}table-warning{% endif %}">
+                                <td>
+                                    <strong>{{ item.medicine.name }}</strong>
+                                </td>
+                                <td>
+                                    {{ item.medicine.active_ingredient|default:"—" }}
+                                </td>
+                                <td>
+                                    {% if item.medicine.category %}
+                                        <span class="badge badge-secondary">{{ item.medicine.category }}</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="fw-bold">{{ item.quantity }}</span>
+                                    {% if item.medicine.dosage_form %}
+                                        <small class="text-muted">({{ item.medicine.dosage_form }})</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.minimum_threshold }}</td>
+                                <td>
+                                    {% if item.quantity <= item.minimum_threshold and item.minimum_threshold > 0 %}
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-exclamation-triangle"></i> Low Stock
+                                        </span>
+                                    {% elif item.quantity == 0 %}
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-times-circle"></i> Out of Stock
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-check-circle"></i> In Stock
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'inventory:edit_medicine' item.id %}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'inventory:delete_medicine' item.id %}" 
+                                           class="btn btn-outline-danger" 
+                                           title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> No medicines in inventory yet.
+                    <a href="{% url 'inventory:add_medicine' %}" class="alert-link">Add one now</a> or
+                    <a href="{% url 'inventory:upload_inventory' %}" class="alert-link">upload via file</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer Info -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <small class="text-muted">
+                <i class="fas fa-info-circle"></i>
+                All inventory changes are logged and immutable. View the <a href="{% url 'inventory:audit_log' %}">audit log</a> for a complete history.
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #858796 !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+</style>
+{% endblock %}
